@@ -1,0 +1,38 @@
+.button {
+  border: none;
+  border-radius: 22px;
+  padding: 12px 35px;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.primary {
+  background: #2563eb;
+  color: white;
+}
+
+.primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(37, 99, 235, 0.35);
+}
+
+.secondary {
+  background: #fff;
+  color: #2563eb;
+  border: 1px solid #2563eb;
+}
+
+.secondary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 14px rgba(37, 99, 235, 0.35);
+}

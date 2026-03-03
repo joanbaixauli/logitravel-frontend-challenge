@@ -1,5 +1,5 @@
 body {
-  background-color: #C0E7FB;
+  background-color: #c0e7fb;
 }
 
 .cardContainer {
@@ -9,7 +9,8 @@ body {
   height: 100vh;
 }
 
-.title, .description {
+.title,
+.description {
   text-align: center;
 }
 

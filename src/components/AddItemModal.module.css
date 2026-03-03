@@ -34,7 +34,9 @@
   font-family: inherit;
 
   outline: none;
-  transition: border-color 0.15s ease, background-color 0.15s ease;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
 }
 
 .modalInput::placeholder {

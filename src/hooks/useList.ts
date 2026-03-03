@@ -1,11 +1,11 @@
-import { useReducer } from "react";
-import { ListItem } from "../types/list";
+import { useReducer } from 'react';
+import type { ListItem } from '../types/list';
 
 // Guardamos índice + item para poder reconstruir el estado exacto en UNDO.
 type HistoryAction =
-  | { type: "add"; item: ListItem; index: number }
-  | { type: "remove"; item: ListItem; index: number }
-  | { type: "group-remove"; items: Array<{ item: ListItem; index: number }> };
+  | { type: 'add'; item: ListItem; index: number }
+  | { type: 'remove'; item: ListItem; index: number }
+  | { type: 'group-remove'; items: Array<{ item: ListItem; index: number }> };
 
 type State = {
   items: ListItem[];
@@ -15,12 +15,12 @@ type State = {
 
 // useReducer simplifica la coordinación entre items, selección e historial.
 type Action =
-  | { type: "ADD_ITEM"; item: ListItem }
-  | { type: "REMOVE_ITEM"; id: string }
-  | { type: "REMOVE_ITEMS"; ids: string[] }
-  | { type: "SET_SELECTED"; ids: string[] }
-  | { type: "RESET_SELECTION" }
-  | { type: "UNDO" };
+  | { type: 'ADD_ITEM'; item: ListItem }
+  | { type: 'REMOVE_ITEM'; id: string }
+  | { type: 'REMOVE_ITEMS'; ids: string[] }
+  | { type: 'SET_SELECTED'; ids: string[] }
+  | { type: 'RESET_SELECTION' }
+  | { type: 'UNDO' };
 
 // Insert helper para evitar repetir lógica de inserción inmutable.
 const insertAt = (list: ListItem[], item: ListItem, index: number) =>
@@ -28,30 +28,30 @@ const insertAt = (list: ListItem[], item: ListItem, index: number) =>
 
 const reducer = (state: State, action: Action): State => {
   switch (action.type) {
-    case "ADD_ITEM": {
+    case 'ADD_ITEM': {
       const index = state.items.length; // Añadimos al final y guardamos posición para UNDO.
       return {
         ...state,
         items: [...state.items, action.item],
-        history: [...state.history, { type: "add", item: action.item, index }],
+        history: [...state.history, { type: 'add', item: action.item, index }],
       };
     }
 
-    case "REMOVE_ITEM": {
-      const index = state.items.findIndex(i => i.id === action.id);
+    case 'REMOVE_ITEM': {
+      const index = state.items.findIndex((i) => i.id === action.id);
       if (index === -1) return state; // Reducer seguro ante acciones inválidas.
 
       const item = state.items[index];
 
       return {
         ...state,
-        items: state.items.filter(i => i.id !== action.id),
-        selectedIds: state.selectedIds.filter(x => x !== action.id), // Evitamos selección huérfana.
-        history: [...state.history, { type: "remove", item, index }],
+        items: state.items.filter((i) => i.id !== action.id),
+        selectedIds: state.selectedIds.filter((x) => x !== action.id), // Evitamos selección huérfana.
+        history: [...state.history, { type: 'remove', item, index }],
       };
     }
 
-    case "REMOVE_ITEMS": {
+    case 'REMOVE_ITEMS': {
       const removed: Array<{ item: ListItem; index: number }> = [];
 
       const nextItems = state.items.filter((it, idx) => {
@@ -65,35 +65,35 @@ const reducer = (state: State, action: Action): State => {
       return {
         ...state,
         items: nextItems,
-        selectedIds: state.selectedIds.filter(x => !action.ids.includes(x)),
+        selectedIds: state.selectedIds.filter((x) => !action.ids.includes(x)),
         history: removed.length
-          ? [...state.history, { type: "group-remove", items: removed }] // Agrupamos para UNDO atómico.
+          ? [...state.history, { type: 'group-remove', items: removed }] // Agrupamos para UNDO atómico.
           : state.history,
       };
     }
 
-    case "SET_SELECTED":
+    case 'SET_SELECTED':
       return { ...state, selectedIds: action.ids }; // Política de selección delegada a la UI.
 
-    case "RESET_SELECTION":
+    case 'RESET_SELECTION':
       return { ...state, selectedIds: [] };
 
-    case "UNDO": {
+    case 'UNDO': {
       const last = state.history[state.history.length - 1];
       if (!last) return state; // UNDO no-op si no hay historial.
 
       const history = state.history.slice(0, -1);
 
-      if (last.type === "add") {
+      if (last.type === 'add') {
         return {
           ...state,
-          items: state.items.filter(i => i.id !== last.item.id),
-          selectedIds: state.selectedIds.filter(x => x !== last.item.id),
+          items: state.items.filter((i) => i.id !== last.item.id),
+          selectedIds: state.selectedIds.filter((x) => x !== last.item.id),
           history,
         };
       }
 
-      if (last.type === "remove") {
+      if (last.type === 'remove') {
         return {
           ...state,
           items: insertAt(state.items, last.item, last.index), // Reinsertamos en posición original.
@@ -124,11 +124,11 @@ export const useList = () => {
     items: state.items,
     selectedIds: state.selectedIds,
     canUndo: state.history.length > 0,
-    setSelectedIds: (ids: string[]) => dispatch({ type: "SET_SELECTED", ids }),
-    resetSelection: () => dispatch({ type: "RESET_SELECTION" }),
-    addItem: (item: ListItem) => dispatch({ type: "ADD_ITEM", item }),
-    removeItem: (id: string) => dispatch({ type: "REMOVE_ITEM", id }),
-    removeItems: (ids: string[]) => dispatch({ type: "REMOVE_ITEMS", ids }),
-    undo: () => dispatch({ type: "UNDO" }),
+    setSelectedIds: (ids: string[]) => dispatch({ type: 'SET_SELECTED', ids }),
+    resetSelection: () => dispatch({ type: 'RESET_SELECTION' }),
+    addItem: (item: ListItem) => dispatch({ type: 'ADD_ITEM', item }),
+    removeItem: (id: string) => dispatch({ type: 'REMOVE_ITEM', id }),
+    removeItems: (ids: string[]) => dispatch({ type: 'REMOVE_ITEMS', ids }),
+    undo: () => dispatch({ type: 'UNDO' }),
   };
 };

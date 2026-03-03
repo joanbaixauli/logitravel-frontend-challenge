@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-import { RotateCcw } from "lucide-react";
+import { RotateCcw } from 'lucide-react';
 
 import './App.css';
 import { Card } from './components/ui/Card';
@@ -11,16 +11,7 @@ import { useList } from './hooks/useList';
 
 function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const {
-    items,
-    selectedIds,
-    canUndo,
-    setSelectedIds,
-    addItem,
-    removeItem,
-    removeItems,
-    undo,
-  } = useList();
+  const { items, selectedIds, canUndo, setSelectedIds, addItem, removeItem, removeItems, undo } = useList();
 
   const handleOpenModal = () => {
     setIsModalOpen(true);
@@ -43,7 +34,7 @@ function App() {
   };
 
   const handleClickItem = (itemId: string) => {
-    selectedIds.includes(itemId) ? setSelectedIds(selectedIds.filter((id) => id !== itemId)) : setSelectedIds([...selectedIds, itemId]);
+    setSelectedIds(selectedIds.includes(itemId) ? selectedIds.filter((id) => id !== itemId) : [...selectedIds, itemId]);
   };
 
   return (
@@ -55,15 +46,28 @@ function App() {
               <h1>This is a technical proof</h1>
             </div>
             <div className="description">
-              <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Dignissimos corporis vero asperiores velit, molestiae est quisquam ex eaque vitae sed. Tempore et incidunt magni totam recusandae nobis mollitia! Adipisci, optio.</p>
+              <p>
+                Lorem ipsum dolor sit amet consectetur adipisicing elit. Dignissimos corporis vero asperiores velit,
+                molestiae est quisquam ex eaque vitae sed. Tempore et incidunt magni totam recusandae nobis mollitia!
+                Adipisci, optio.
+              </p>
             </div>
           </div>
-          <ItemList items={items} selectedIds={selectedIds} onClickItem={handleClickItem} onDeleteItem={handleDeleteItem} />
+          <ItemList
+            items={items}
+            selectedIds={selectedIds}
+            onClickItem={handleClickItem}
+            onDeleteItem={handleDeleteItem}
+          />
           {/* Botones de acción */}
           <div className="cardActions">
             <div className="leftButtons">
-              <Button onClick={handleUndo} variant="secondary" disabled={!canUndo}><RotateCcw size={18} /></Button>
-              <Button onClick={handleDeleteItems} variant="secondary" disabled={selectedIds.length === 0}>DELETE</Button>
+              <Button onClick={handleUndo} variant="secondary" disabled={!canUndo} aria-label="Undo">
+                <RotateCcw size={18} />
+              </Button>
+              <Button onClick={handleDeleteItems} variant="secondary" disabled={selectedIds.length === 0}>
+                DELETE
+              </Button>
             </div>
             <div className="rightButtons">
               <Button onClick={handleOpenModal}>ADD</Button>

@@ -1,8 +1,19 @@
+## Stack y herramientas
+
+* **Vite** – Build tool y servidor de desarrollo
+* **React 19** + **TypeScript**
+* **Vitest** + **React Testing Library** – Tests unitarios
+* **ESLint** – Linting
+* **Prettier** – Formato de código
+* **CSS Modules** – Estilos por componente
+
+---
+
 ## Cómo ejecutar
 
 ### Prerrequisitos
 
-* Node.js (versión 16 o superior)
+* Node.js (versión 18 o superior recomendada)
 * npm o yarn
 
 ### Instalación
@@ -13,31 +24,62 @@ npm install
 
 ### Desarrollo
 
-Inicia el servidor de desarrollo:
+Inicia el servidor de desarrollo con Vite:
 
 ```bash
-npm start
+npm run dev
 ```
 
-La aplicación se abrirá en [http://localhost:3000](http://localhost:3000)
+La aplicación se abrirá en [http://localhost:5173](http://localhost:5173)
+
+### Build de producción
+
+```bash
+npm run build
+```
+
+Para previsualizar el build:
+
+```bash
+npm run preview
+```
+
+### Linting y formato
+
+```bash
+npm run lint      # ESLint
+npm run format    # Prettier (formatear todo el proyecto)
+```
 
 ### Testing
 
-Ejecuta los tests:
+Ejecuta los tests con Vitest:
 
 ```bash
 npm test
+```
+
+En modo watch (re-ejecuta al cambiar archivos):
+
+```bash
+npm test -- --watch
+```
+
+Cobertura:
+
+```bash
+npm test -- --coverage
 ```
 
 ---
 
 ## Suite de Tests
 
-La aplicación incluye una suite completa de tests unitarios que cubre los componentes, hooks y utilidades principales. Los tests utilizan **Jest** y **React Testing Library** para garantizar el correcto funcionamiento de la aplicación.
+La aplicación incluye una suite completa de tests unitarios que cubre los componentes, hooks y utilidades principales. Los tests utilizan **Vitest** y **React Testing Library** para garantizar el correcto funcionamiento de la aplicación.
 
 ### Configuración
 
-Los tests están configurados mediante `jest.config.js` usando **ts-jest** para soportar TypeScript. El entorno de pruebas está configurado para Node.js.
+Los tests están configurados en `vitest.config.ts`: entorno **jsdom**, `setupFiles` en `src/setupTests.ts` (donde se importa `@testing-library/jest-dom`). Los **CSS Modules** no se mockean: Vitest está configurado con `generateScopedName: '[local]'` para que los nombres de clase sean predecibles en los tests. El modal usa el elemento nativo `<dialog>` (sin portal ni `modal-root`), por lo que no se requiere mock de portal.
 
 ### Archivos de Test
 
@@ -62,7 +104,7 @@ Tests del hook principal que gestiona la lógica de negocio de la lista.
 
 #### 2. `components/AddItemModal.test.tsx`
 
-Tests del modal para añadir nuevos items.
+Tests del modal para añadir nuevos items (componente basado en `<dialog>` nativo).
 
 **Cobertura:**
 - Renderizado condicional: No se renderiza cuando `isOpen=false`
@@ -74,10 +116,8 @@ Tests del modal para añadir nuevos items.
 - Click dentro del modal: No cierra (stopPropagation)
 
 **Mocks utilizados:**
-- CSS Modules
-- `generateId` utility (mockeado para controlar IDs en tests)
-- Componentes `Card` y `Button` (simplificados)
-- Portal DOM (`modal-root`)
+- `generateId` (mockeado para controlar IDs en tests)
+- Componentes `Card` y `Button` (simplificados para aislar el modal)
 
 #### 3. `components/ui/Button.test.tsx`
 
@@ -147,7 +187,7 @@ Tests de la utilidad para generar IDs únicos.
 #### Enfoque
 
 1. **Testing de componentes**: Se utiliza React Testing Library con enfoque en comportamiento del usuario, no en detalles de implementación
-2. **Mocks estratégicos**: Se mockean dependencias externas (CSS Modules, utilidades, componentes complejos) para aislar las unidades bajo test
+2. **Mocks estratégicos**: Se mockean solo lo necesario (utilidades como `generateId`, componentes complejos cuando interesa aislar) para aislar las unidades bajo test. Los CSS Modules no se mockean gracias a la configuración de Vitest (`generateScopedName: '[local]'`)
 3. **Testing de hooks**: Se usa `renderHook` de React Testing Library para testear hooks de forma aislada
 4. **Casos edge**: Se incluyen tests para casos límite (arrays vacíos, ids inexistentes, historial vacío)
 
@@ -169,34 +209,10 @@ La suite de tests cubre:
 - ✅ Componente raíz (`App`) - integración de flujos principales
 - ✅ Utilidades (`generateId`)
 
-### Ejecutar Tests Específicos
-
 Para ejecutar un archivo de test específico:
 
 ```bash
 npm test -- AddItemModal.test.tsx
-```
-
-Para ejecutar en modo watch:
-
-```bash
-npm test -- --watch
-```
-
-Para ver cobertura:
-
-```bash
-npm test -- --coverage
-```
-
----
-
-### Build de producción
-
-Genera la versión optimizada para producción:
-
-```bash
-npm run build
 ```
 
 ---
@@ -301,9 +317,9 @@ Al hacer `undo`, se toma la última acción y se aplica la operación inversa.
 * **CSS Modules**: Se utiliza CSS Modules para encapsular estilos y evitar conflictos de nombres.
 * **TypeScript**: Tipado estricto para mayor seguridad y mejor DX.
 
-### Portal para modales
+### Modal
 
-* Se utiliza `createPortal` de React para renderizar el modal fuera del árbol DOM principal, mejorando la gestión de z-index y accesibilidad.
+* El modal de añadir item usa el elemento nativo **`<dialog>`** con `showModal()` / `close()`, sin portal ni nodo `modal-root`. Esto simplifica el DOM y la accesibilidad (focus, tecla Escape) la gestiona el navegador.
 
 ---
 
@@ -313,23 +329,31 @@ La aplicación sigue una arquitectura modular y escalable:
 
 ```
 src/
-├── components/          # Componentes de funcionalidad
+├── components/           # Componentes de funcionalidad
 │   ├── AddItemModal.tsx
-│   ├── list/           # Componentes específicos de lista
+│   ├── AddItemModal.module.css
+│   ├── list/             # Componentes específicos de lista
 │   │   ├── Item.tsx
-│   │   └── ItemList.tsx
-│   └── ui/             # Componentes UI reutilizables
+│   │   ├── Item.module.css
+│   │   ├── ItemList.tsx
+│   │   └── ItemList.module.css
+│   └── ui/               # Componentes UI reutilizables
 │       ├── Button.tsx
-│       └── Card.tsx
-├── hooks/              # Custom hooks
-│   └── useList.ts      # Hook principal con lógica de negocio
-├── types/              # Definiciones de tipos TypeScript
+│       ├── Button.module.css
+│       ├── Card.tsx
+│       └── Card.module.css
+├── hooks/
+│   └── useList.ts        # Hook principal con lógica de negocio
+├── types/
 │   └── list.ts
-├── utils/              # Utilidades
+├── utils/
 │   └── generateId.ts
-├── styles/             # Estilos globales
+├── styles/
 │   └── globals.css
-└── App.tsx             # Componente raíz
+├── App.tsx
+├── App.css
+├── main.tsx             # Entrada (Vite)
+└── setupTests.ts        # Setup para Vitest (jest-dom)
 ```
 
 **Flujo de datos**:
@@ -344,7 +368,7 @@ src/
 ### Implementado
 
 * **Estructura semántica**: Uso de elementos HTML semánticos (`<ul>`, `<li>`, `<button>`)
-* **Portal para modales**: El modal se renderiza fuera del flujo principal del DOM
+* **Modal con `<dialog>`**: Uso del elemento nativo para modales (gestión de focus y Escape por el navegador)
 * **Role presentation**: El backdrop del modal tiene `role="presentation"` para indicar que es decorativo
 
 ---

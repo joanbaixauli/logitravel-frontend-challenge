@@ -1,7 +1,17 @@
-import { ListItem } from "../../types/list";
-import styles from "./Item.module.css";
+import type { ListItem } from '../../types/list';
+import styles from './Item.module.css';
 
-export const Item = ({ item, selected, onClickItem, onDeleteItem }: { item: ListItem, selected: boolean, onClickItem: (id: string) => void, onDeleteItem: (id: string) => void }) => {
+export const Item = ({
+  item,
+  selected,
+  onClickItem,
+  onDeleteItem,
+}: {
+  item: ListItem;
+  selected: boolean;
+  onClickItem: (id: string) => void;
+  onDeleteItem: (id: string) => void;
+}) => {
   const handleSelectItem = () => {
     onClickItem(item.id);
   };
@@ -11,7 +21,12 @@ export const Item = ({ item, selected, onClickItem, onDeleteItem }: { item: List
   };
 
   return (
-    <li className={`${styles.item} ${selected ? styles.selected : ""}`} onClick={handleSelectItem} onDoubleClick={handleDeleteItem}>
+    <li
+      className={`${styles.item} ${selected ? styles.selected : ''}`}
+      onClick={handleSelectItem}
+      onDoubleClick={handleDeleteItem}
+      aria-selected={selected}
+    >
       <span>{item.text}</span>
     </li>
   );

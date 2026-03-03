@@ -1,4 +1,18 @@
-/* Capa gris */
+.dialog {
+  border: none;
+  padding: 0;
+  max-width: 600px;
+  width: 100%;
+  margin: auto;
+  background: transparent;
+  box-shadow: none;
+}
+
+.dialog::backdrop {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+/* Contenido centrado dentro del dialog */
 .modalOverlay {
   position: fixed;
   inset: 0;

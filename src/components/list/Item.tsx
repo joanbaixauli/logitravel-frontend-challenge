@@ -1,17 +1,14 @@
 import type { ListItem } from '../../types/list';
 import styles from './Item.module.css';
 
-export const Item = ({
-  item,
-  selected,
-  onClickItem,
-  onDeleteItem,
-}: {
+export type ItemProps = {
   item: ListItem;
   selected: boolean;
   onClickItem: (id: string) => void;
   onDeleteItem: (id: string) => void;
-}) => {
+};
+
+export const Item = ({ item, selected, onClickItem, onDeleteItem }: ItemProps) => {
   const handleSelectItem = () => {
     onClickItem(item.id);
   };

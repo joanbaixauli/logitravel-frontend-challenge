@@ -32,6 +32,8 @@ export const AddItemModal = ({
   };
 
   const handleAddItem = () => {
+    if (inputValue.trim() === '') return;
+
     addItem({
       id: generateId(),
       text: inputValue,
@@ -41,13 +43,23 @@ export const AddItemModal = ({
   };
 
   return (
-    <dialog ref={dialogRef} className={styles.dialog} onClose={handleDialogClose}>
+    <dialog
+      ref={dialogRef}
+      className={styles.dialog}
+      onClose={handleDialogClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="add-item-dialog-label"
+    >
       <div className={styles.modalOverlay}>
         <Card>
           <div className={styles.modalTitle}>
-            <p>Add Item to list</p>
+            <label id="add-item-dialog-label" htmlFor="add-item-input">
+              Add Item to list
+            </label>
           </div>
           <input
+            id="add-item-input"
             type="text"
             placeholder="Type the text here..."
             value={inputValue}
